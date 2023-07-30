@@ -1,0 +1,40 @@
+name: "TFly"
+main: net.okocraft.tfly.TFlyPlugin
+version: ${project.version}
+author: "Siroshun09"
+api-version: "1.16"
+folia-supported: true
+
+commands:
+  tfly:
+    aliases: ["timedfly"]
+
+permissions:
+  tfly.command:
+    default: true
+  tfly.command.help:
+    default: true
+  tfly.command.pause:
+    default: true
+  tfly.command.pause.other:
+    default: op
+  tfly.command.resume:
+    default: true
+  tfly.command.resume.other:
+    default: op
+  tfly.command.toggle:
+    default: true
+  tfly.command.toggle.other:
+    default: op
+  tfly.command.remaining:
+    default: true
+  tfly.command.remaining.other:
+    default: op
+  tfly.command.add:
+    default: op
+  tfly.command.check:
+    default: op
+  tfly.command.set:
+    default: op
+  tfly.command.reload:
+    default: op

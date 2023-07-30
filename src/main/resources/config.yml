@@ -1,0 +1,10 @@
+notification:
+  enable-action-bar: true
+  time-to-notify:
+    - 60
+    - 30
+    - 3
+    - 2
+    - 1
+enabled-worlds:
+  - world
