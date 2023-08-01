@@ -30,7 +30,7 @@ public class CheckCommand implements SubCommand {
     @Override
     public @NotNull MiniMessageBuilder help(@NotNull Locale locale) {
         return HelpFactory.create(
-                () -> localization.findSource(locale).builder(),
+                localization.findSource(locale),
                 MessageKeys.COMMAND_CHECK_HELP,
                 MessageKeys.COMMAND_CHECK_COMMANDLINE
         );
@@ -67,7 +67,7 @@ public class CheckCommand implements SubCommand {
 
         if (target.isFlying()) {
             if (data != null && data.status() == TFlyData.Status.RUNNING) {
-                builder.key(MessageKeys.COMMAND_CHECK_FLYING).tagResolver(Placeholders.remainingTime(data.remainingTime(), source::builder));
+                builder.key(MessageKeys.COMMAND_CHECK_FLYING).tagResolver(Placeholders.remainingTime(data.remainingTime(), source));
             } else {
                 builder.key(MessageKeys.COMMAND_CHECK_FLYING_BUT_NOT_TFLY);
             }

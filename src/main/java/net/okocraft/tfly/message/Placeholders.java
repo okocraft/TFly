@@ -1,7 +1,6 @@
 package net.okocraft.tfly.message;
 
-import com.github.siroshun09.messages.api.builder.MiniMessageBuilder;
-import com.github.siroshun09.messages.api.util.MessageBuilderFactory;
+import com.github.siroshun09.messages.api.source.MiniMessageSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.TagPattern;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -28,13 +27,13 @@ public final class Placeholders {
         return Placeholder.component("permission", Component.text(node));
     }
 
-    public static @NotNull TagResolver remainingTime(long sec, @NotNull MessageBuilderFactory<MiniMessageBuilder> builderFactory) {
-        return Placeholder.component("remaining_time", remainingTimeComponent(sec, builderFactory));
+    public static @NotNull TagResolver remainingTime(long sec, @NotNull MiniMessageSource source) {
+        return Placeholder.component("remaining_time", remainingTimeComponent(sec, source));
     }
 
-    public static @NotNull Component remainingTimeComponent(long sec, @NotNull MessageBuilderFactory<MiniMessageBuilder> builderFactory) {
+    public static @NotNull Component remainingTimeComponent(long sec, @NotNull MiniMessageSource source) {
         if (sec < 1) {
-            return builderFactory.create().key("remaining-time.none").build();
+            return source.builder().key("remaining-time.none").build();
         }
 
         var duration = Duration.ofSeconds(sec);
@@ -46,29 +45,29 @@ public final class Placeholders {
         long seconds = duration.toSecondsPart();
 
         if (hours != 0) {
-            result.append(formatTime(hours, "hours", builderFactory));
+            result.append(formatTime(hours, "hours", source));
         }
 
         if (minutes != 0) {
             if (hours != 0) {
                 result.appendSpace();
             }
-            result.append(formatTime(minutes, "minutes", builderFactory));
+            result.append(formatTime(minutes, "minutes", source));
         }
 
         if (seconds != 0) {
             if (hours != 0 || minutes != 0) {
                 result.appendSpace();
             }
-            result.append(formatTime(seconds, "seconds", builderFactory));
+            result.append(formatTime(seconds, "seconds", source));
         }
 
         return result.build();
     }
 
-    private static @NotNull Component formatTime(long time, @TagPattern @NotNull String unitName, @NotNull MessageBuilderFactory<MiniMessageBuilder> factory) {
+    private static @NotNull Component formatTime(long time, @TagPattern @NotNull String unitName, @NotNull MiniMessageSource source) {
         boolean singular = time == 1;
-        return factory.create()
+        return source.builder()
                 .key("remaining-time." + unitName + "." + (singular ? "singular" : "plural"))
                 .tagResolver(Placeholder.component(unitName, Component.text(time)))
                 .build();

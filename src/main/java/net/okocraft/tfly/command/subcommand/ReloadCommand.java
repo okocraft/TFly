@@ -24,7 +24,7 @@ public class ReloadCommand implements SubCommand {
     @Override
     public @NotNull MiniMessageBuilder help(@NotNull Locale locale) {
         return HelpFactory.create(
-                () -> localization.findSource(locale).builder(),
+                localization.findSource(locale),
                 MessageKeys.COMMAND_RELOAD_HELP,
                 MessageKeys.COMMAND_RELOAD_COMMANDLINE
         );

@@ -84,7 +84,7 @@ public final class PlaceholderAPIHook {
             return PlainTextComponentSerializer.plainText().serialize(
                     Placeholders.remainingTimeComponent(
                             remainingTime,
-                            localization.findSource(LocaleUtils.getFrom(player))::builder
+                            localization.findSource(LocaleUtils.getFrom(player))
                     )
             );
         }

@@ -2,7 +2,6 @@ package net.okocraft.tfly.command.subcommand;
 
 import com.github.siroshun09.messages.api.builder.MiniMessageBuilder;
 import com.github.siroshun09.messages.api.localize.MiniMessageLocalization;
-import com.github.siroshun09.messages.api.util.MessageBuilderFactory;
 import net.okocraft.tfly.data.TFlyDataProvider;
 import net.okocraft.tfly.message.HelpFactory;
 import net.okocraft.tfly.message.MessageKeys;
@@ -25,7 +24,7 @@ public class SetCommand extends AbstractTFlyDataCommand {
     @Override
     public @NotNull MiniMessageBuilder help(@NotNull Locale locale) {
         return HelpFactory.create(
-                () -> localization.findSource(locale).builder(),
+                localization.findSource(locale),
                 MessageKeys.COMMAND_SET_HELP,
                 MessageKeys.COMMAND_SET_COMMANDLINE
         );
@@ -60,12 +59,12 @@ public class SetCommand extends AbstractTFlyDataCommand {
         }
 
         long now = data.remainingTime(current -> Math.max(seconds, 0));
-        MessageBuilderFactory<MiniMessageBuilder> factory = () -> localization.findSource(locale).builder();
-        factory.create()
+        var source = localization.findSource(locale);
+        source.builder()
                 .key(MessageKeys.COMMAND_SET_SUCCESS)
                 .tagResolvers(
                         Placeholders.player(args[1]),
-                        Placeholders.remainingTime(now, factory)
+                        Placeholders.remainingTime(now, source)
                 ).send(sender);
     }
 

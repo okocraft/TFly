@@ -1,8 +1,6 @@
 package net.okocraft.tfly.listener;
 
-import com.github.siroshun09.messages.api.builder.MiniMessageBuilder;
 import com.github.siroshun09.messages.api.localize.MiniMessageLocalization;
-import com.github.siroshun09.messages.api.util.MessageBuilderFactory;
 import net.okocraft.tfly.config.TFlyConfig;
 import net.okocraft.tfly.event.TFlyProgressEvent;
 import net.okocraft.tfly.event.TFlyStartedEvent;
@@ -33,13 +31,12 @@ public class TFlyEventListener implements Listener {
         }
 
         long remaining = event.getCurrentRemainingTime();
-
-        MessageBuilderFactory<MiniMessageBuilder> factory = () -> localization.findSource(player.locale()).builder();
-        var placeholder = Placeholders.remainingTime(remaining, factory);
+        var source = localization.findSource(player.locale());
+        var placeholder = Placeholders.remainingTime(remaining, source);
 
         if (config.enableActionbarNotification()) {
             player.sendActionBar(
-                    factory.create()
+                    source.builder()
                             .key(MessageKeys.NOTIFICATION_ACTIONBAR_REMAINING_TIME)
                             .tagResolver(placeholder)
                             .build()
@@ -47,7 +44,7 @@ public class TFlyEventListener implements Listener {
         }
 
         if (config.notificationTime().contains(remaining)) {
-            factory.create()
+            source.builder()
                     .key(MessageKeys.NOTIFICATION_MESSAGE_REMAINING)
                     .tagResolver(placeholder)
                     .send(player);

@@ -24,7 +24,7 @@ public class RemainingCommand extends AbstractTFlyDataCommand {
     @Override
     public @NotNull MiniMessageBuilder help(@NotNull Locale locale) {
         return HelpFactory.create(
-                () -> localization.findSource(locale).builder(),
+                localization.findSource(locale),
                 MessageKeys.COMMAND_REMAINING_HELP,
                 MessageKeys.COMMAND_REMAINING_COMMANDLINE
         );
@@ -71,7 +71,7 @@ public class RemainingCommand extends AbstractTFlyDataCommand {
             } else {
                 builder.key(MessageKeys.COMMAND_REMAINING_TIME_OTHER).tagResolver(Placeholders.player(args[1]));
             }
-            builder.tagResolver(Placeholders.remainingTime(data.remainingTime(), localization.findSource(locale)::builder));
+            builder.tagResolver(Placeholders.remainingTime(data.remainingTime(), localization.findSource(locale)));
         }
 
         builder.send(sender);

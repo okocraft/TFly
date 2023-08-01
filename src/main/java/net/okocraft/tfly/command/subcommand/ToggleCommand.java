@@ -47,7 +47,7 @@ public class ToggleCommand implements SubCommand {
 
     @Override
     public @NotNull MiniMessageBuilder help(@NotNull Locale locale) {
-        return HelpFactory.create(() -> localization.findSource(locale).builder(), helpKey(), commandlineKey());
+        return HelpFactory.create(localization.findSource(locale), helpKey(), commandlineKey());
     }
 
     @Override
