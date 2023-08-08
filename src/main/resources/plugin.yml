@@ -14,14 +14,6 @@ permissions:
     default: true
   tfly.command.help:
     default: true
-  tfly.command.pause:
-    default: true
-  tfly.command.pause.other:
-    default: op
-  tfly.command.resume:
-    default: true
-  tfly.command.resume.other:
-    default: op
   tfly.command.toggle:
     default: true
   tfly.command.toggle.other:
