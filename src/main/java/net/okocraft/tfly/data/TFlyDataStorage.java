@@ -10,6 +10,6 @@ public sealed interface TFlyDataStorage permits TFlyDataFlatFileStorage {
         return new DatFileStorage(plugin.getDataFolder().toPath().resolve("players.dat"));
     }
 
-    record TFlyDataRecord(long remainingTime, boolean paused) {
+    record TFlyDataRecord(long remainingTime, boolean stoppedOnQuit) {
     }
 }

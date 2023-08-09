@@ -43,6 +43,7 @@ public class TFlyController {
             return;
         }
 
+        data.stoppedOnQuit(false);
         player.setAllowFlight(true);
         player.setFlying(true);
 
@@ -72,6 +73,10 @@ public class TFlyController {
             player.setAllowFlight(false);
         }
 
+        if (data != null) {
+            data.stoppedOnQuit(true);
+        }
+
         var task = taskMap.remove(uuid);
 
         if (task != null) {
@@ -90,6 +95,8 @@ public class TFlyController {
             if (data == null) {
                 continue;
             }
+
+            data.stoppedOnQuit(true);
 
             var status = data.status();
 

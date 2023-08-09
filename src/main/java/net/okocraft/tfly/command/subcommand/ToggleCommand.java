@@ -90,7 +90,7 @@ public class ToggleCommand implements SubCommand {
         boolean pause = switch (type) {
             case PAUSE -> true;
             case RESUME -> false;
-            case TOGGLE -> status == TFlyData.Status.RUNNING && !data.paused();
+            case TOGGLE -> status == TFlyData.Status.RUNNING;
         };
 
         if (pause) {
@@ -126,7 +126,6 @@ public class ToggleCommand implements SubCommand {
 
     private void pause(@NotNull CommandSender sender, @NotNull Player target, @NotNull TFlyData data) {
         if (data.statusIf(status -> status == TFlyData.Status.RUNNING || status == TFlyData.Status.STARTING, TFlyData.Status.STOPPING)) {
-            data.paused(true);
             controller.stop(target, true);
         } else {
             var builder = localization.findSource(LocaleUtils.getFrom(sender)).builder();
@@ -169,7 +168,6 @@ public class ToggleCommand implements SubCommand {
         }
 
         if (data.statusIf(status -> status == TFlyData.Status.STOPPED, TFlyData.Status.STARTING)) {
-            data.paused(false);
             controller.start(target);
         } else {
             var builder = localization.findSource(LocaleUtils.getFrom(sender)).builder();

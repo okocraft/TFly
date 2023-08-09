@@ -35,10 +35,10 @@ public class PlayerMonitor implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onSpawn(@NotNull PlayerSpawnLocationEvent event) {
-        scheduler.runPlayerTask(event.getPlayer(), this::startIfNotPaused);
+        scheduler.runPlayerTask(event.getPlayer(), this::startIfNotStoppedOnQuit);
     }
 
-    private void startIfNotPaused(@NotNull Player player) {
+    private void startIfNotStoppedOnQuit(@NotNull Player player) {
         if (!player.isOnline()) {
             return;
         }
@@ -53,14 +53,14 @@ public class PlayerMonitor implements Listener {
         var data = dataProvider.getIfLoaded(uuid);
 
         if (data == null) {
-            scheduler.runAsyncTask(() -> startIfNotPaused(player, dataProvider.getOrLoad(uuid)));
+            scheduler.runAsyncTask(() -> startIfNotStoppedOnQuit(player, dataProvider.getOrLoad(uuid)));
         } else {
-            startIfNotPaused(player, data);
+            startIfNotStoppedOnQuit(player, data);
         }
     }
 
-    private void startIfNotPaused(@NotNull Player player, @NotNull TFlyData data) {
-        if (data.paused() || data.remainingTime() < 1 || !locationChecker.test(player)) {
+    private void startIfNotStoppedOnQuit(@NotNull Player player, @NotNull TFlyData data) {
+        if (data.stoppedOnQuit() || data.remainingTime() < 1 || !locationChecker.test(player)) {
             return;
         }
 

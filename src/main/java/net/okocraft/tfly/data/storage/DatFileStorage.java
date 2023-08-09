@@ -55,7 +55,7 @@ public class DatFileStorage implements TFlyDataFlatFileStorage {
 
         UUID uuid = null;
         long remainingTime = 0;
-        boolean paused = false;
+        boolean stoppedOnQuit = true;
 
         if (0 < elements.length) {
             try {
@@ -73,10 +73,10 @@ public class DatFileStorage implements TFlyDataFlatFileStorage {
         }
 
         if (2 < elements.length) {
-            paused = Boolean.parseBoolean(elements[2]);
+            stoppedOnQuit = Boolean.parseBoolean(elements[2]);
         }
 
-        dataMap.put(uuid, new TFlyData(remainingTime, paused));
+        dataMap.put(uuid, new TFlyData(remainingTime, stoppedOnQuit));
     }
 
     private void saveAll0(@NotNull Map<UUID, TFlyDataRecord> dataMap) throws IOException {
@@ -101,7 +101,7 @@ public class DatFileStorage implements TFlyDataFlatFileStorage {
                 writer.write(SPLITTER);
                 writer.write(Long.toString(data.remainingTime()));
                 writer.write(SPLITTER);
-                writer.write(Boolean.toString(data.paused()));
+                writer.write(Boolean.toString(data.stoppedOnQuit()));
                 writer.newLine();
             }
         }

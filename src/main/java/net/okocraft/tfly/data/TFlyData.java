@@ -24,16 +24,16 @@ public class TFlyData {
 
     private Status status = Status.STOPPED;
     private long remainingTime = 0;
-    private boolean paused = false;
+    private boolean stoppedOnQuit = true;
 
     private boolean dirty = false;
 
     public TFlyData() {
     }
 
-    public TFlyData(long remainingTime, boolean paused) {
+    public TFlyData(long remainingTime, boolean stoppedOnQuit) {
         this.remainingTime = remainingTime;
-        this.paused = paused;
+        this.stoppedOnQuit = stoppedOnQuit;
     }
 
     /**
@@ -84,19 +84,19 @@ public class TFlyData {
         return modified;
     }
 
-    public boolean paused() {
-        boolean paused;
+    public boolean stoppedOnQuit() {
+        boolean stoppedOnQuit;
 
         synchronized (lock) {
-            paused = this.paused;
+            stoppedOnQuit = this.stoppedOnQuit;
         }
 
-        return paused;
+        return stoppedOnQuit;
     }
 
-    public void paused(boolean paused) {
+    public void stoppedOnQuit(boolean stoppedOnQuit) {
         synchronized (lock) {
-            this.paused = paused;
+            this.stoppedOnQuit = stoppedOnQuit;
             this.dirty = true;
         }
     }
@@ -149,7 +149,7 @@ public class TFlyData {
     @NotNull TFlyDataStorage.TFlyDataRecord asRecord() {
         TFlyDataStorage.TFlyDataRecord result;
         synchronized (lock) {
-            result = new TFlyDataStorage.TFlyDataRecord(this.remainingTime, this.paused);
+            result = new TFlyDataStorage.TFlyDataRecord(this.remainingTime, this.stoppedOnQuit);
             this.dirty = false;
         }
         return result;
@@ -158,7 +158,7 @@ public class TFlyData {
     @Nullable TFlyDataStorage.TFlyDataRecord asRecordIfDirty() {
         TFlyDataStorage.TFlyDataRecord result;
         synchronized (lock) {
-            result = this.dirty ? new TFlyDataStorage.TFlyDataRecord(this.remainingTime, this.paused) : null;
+            result = this.dirty ? new TFlyDataStorage.TFlyDataRecord(this.remainingTime, this.stoppedOnQuit) : null;
             this.dirty = false;
         }
         return result;
