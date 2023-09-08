@@ -65,12 +65,13 @@ public class CheckCommand implements SubCommand {
         var source = localization.findSource(locale);
         var builder = source.builder().tagResolver(Placeholders.player(target.getName()));
 
+        if (data != null && data.status() == TFlyData.Status.RUNNING) {
+            builder.key(MessageKeys.COMMAND_CHECK_FLYING).tagResolver(Placeholders.remainingTime(data.remainingTime(), source));
+            return;
+        }
+
         if (target.isFlying()) {
-            if (data != null && data.status() == TFlyData.Status.RUNNING) {
-                builder.key(MessageKeys.COMMAND_CHECK_FLYING).tagResolver(Placeholders.remainingTime(data.remainingTime(), source));
-            } else {
-                builder.key(MessageKeys.COMMAND_CHECK_FLYING_BUT_NOT_TFLY);
-            }
+            builder.key(MessageKeys.COMMAND_CHECK_FLYING_BUT_NOT_TFLY);
         } else {
             builder.key(MessageKeys.COMMAND_CHECK_NOT_FLYING);
         }
