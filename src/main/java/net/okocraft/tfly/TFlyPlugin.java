@@ -1,13 +1,19 @@
 package net.okocraft.tfly;
 
+import com.github.siroshun09.messages.api.directory.DirectorySource;
+import com.github.siroshun09.messages.api.directory.LoadedMessageSource;
 import com.github.siroshun09.messages.api.localize.MiniMessageLocalization;
 import com.github.siroshun09.messages.api.source.MiniMessageSource;
 import com.github.siroshun09.messages.api.source.StringMessageMap;
-import com.github.siroshun09.messages.api.util.Loader;
 import com.github.siroshun09.messages.api.util.PropertiesFile;
 import net.okocraft.tfly.checker.LocationChecker;
 import net.okocraft.tfly.command.TFlyCommand;
-import net.okocraft.tfly.command.subcommand.*;
+import net.okocraft.tfly.command.subcommand.AddCommand;
+import net.okocraft.tfly.command.subcommand.CheckCommand;
+import net.okocraft.tfly.command.subcommand.ReloadCommand;
+import net.okocraft.tfly.command.subcommand.RemainingCommand;
+import net.okocraft.tfly.command.subcommand.SetCommand;
+import net.okocraft.tfly.command.subcommand.ToggleCommand;
 import net.okocraft.tfly.config.TFlyConfig;
 import net.okocraft.tfly.data.TFlyDataProvider;
 import net.okocraft.tfly.data.TFlyDataStorage;
@@ -15,7 +21,6 @@ import net.okocraft.tfly.hook.PlaceholderAPIHook;
 import net.okocraft.tfly.listener.PlayerMonitor;
 import net.okocraft.tfly.listener.TFlyEventListener;
 import net.okocraft.tfly.message.MessageKeys;
-import net.okocraft.tfly.message.MessageLoader;
 import net.okocraft.tfly.player.TFlyController;
 import net.okocraft.tfly.scheduler.Scheduler;
 import org.bukkit.Bukkit;
@@ -24,16 +29,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 public class TFlyPlugin extends JavaPlugin {
 
@@ -159,35 +163,48 @@ public class TFlyPlugin extends JavaPlugin {
     }
 
     private void loadMessages() throws IOException {
-        var languageDirectory = getDataFolder().toPath().resolve("languages");
-        var loader = MessageLoader.createLoader(languageDirectory, builtinMessageLoader()).andThen(MiniMessageSource::create);
-
-        if (!Files.isDirectory(languageDirectory)) {
-            Files.createDirectories(languageDirectory);
-        }
-
-        if (localization == null) { // on startup
-            localization = new MiniMessageLocalization(MiniMessageSource.create(StringMessageMap.create(MessageKeys.defaultMessages())));
+        if (this.localization == null) { // on startup
+            this.localization = new MiniMessageLocalization(MiniMessageSource.create(StringMessageMap.create(MessageKeys.defaultMessages())));
         } else { // on reload
-            localization.clearSources();
+            this.localization.clearSources();
         }
 
-        try (var locales = Stream.concat(Stream.of(Locale.ENGLISH, Locale.JAPANESE), MessageLoader.fromDirectory(languageDirectory))) {
-            locales.distinct().forEach(locale -> {
-                var loadedSource = loader.apply(locale); // can throw IOException
-                localization.addSource(locale, loadedSource);
-            });
+        DirectorySource.<StringMessageMap>create(this.getDataFolder().toPath().resolve("languages"))
+                .fileExtension(PropertiesFile.FILE_EXTENSION)
+                .defaultLocale(Locale.ENGLISH, Locale.JAPANESE)
+                .messageLoader(PropertiesFile.DEFAULT_LOADER)
+                .load(this::processLoadedMessages);
+    }
+
+    private @Nullable Void processLoadedMessages(@NotNull LoadedMessageSource<StringMessageMap> loadedSource) throws IOException {
+        var locale = loadedSource.locale();
+        var messageSource = loadedSource.messageSource();
+
+        var defaultMessageMap = this.loadDefaultMessageMap(locale);
+
+        if (defaultMessageMap != null) {
+            this.mergeAndAppendMissingMessages(loadedSource.filepath(), messageSource, defaultMessageMap);
+        }
+
+        this.localization.addSource(locale, MiniMessageSource.create(messageSource));
+        return null;
+    }
+
+    private void mergeAndAppendMissingMessages(@NotNull Path filepath, @NotNull StringMessageMap target, @NotNull Map<String, String> defaultMessages) throws IOException {
+        var missingMessages = target.mergeAndCollectMissingMessages(defaultMessages);
+
+        if (!missingMessages.isEmpty()) {
+            PropertiesFile.append(filepath, missingMessages);
         }
     }
 
-    private @NotNull Loader<Locale, Optional<Map<String, String>>> builtinMessageLoader() {
-        return locale -> {
-            if (locale.equals(Locale.ENGLISH)) {
-                return Optional.of(MessageKeys.defaultMessages());
+    private @Nullable Map<String, String> loadDefaultMessageMap(@NotNull Locale locale) throws IOException {
+        if (locale.equals(Locale.ENGLISH)) {
+            return MessageKeys.defaultMessages();
+        } else {
+            try (var input = this.getResource(locale + ".properties")) {
+                return input != null ? PropertiesFile.load(input) : null;
             }
-            try (var input = getResource(locale + ".properties")) {
-                return input != null ? Optional.of(PropertiesFile.load(input)) : Optional.empty();
-            }
-        };
+        }
     }
 }
