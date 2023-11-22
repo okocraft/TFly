@@ -1,12 +1,11 @@
 package net.okocraft.tfly.listener;
 
-import com.github.siroshun09.messages.api.localize.MiniMessageLocalization;
+import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
 import net.okocraft.tfly.config.TFlyConfig;
 import net.okocraft.tfly.event.TFlyProgressEvent;
 import net.okocraft.tfly.event.TFlyStartedEvent;
 import net.okocraft.tfly.event.TFlyStoppedEvent;
 import net.okocraft.tfly.message.MessageKeys;
-import net.okocraft.tfly.message.Placeholders;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,22 +31,13 @@ public class TFlyEventListener implements Listener {
 
         long remaining = event.getCurrentRemainingTime();
         var source = localization.findSource(player.locale());
-        var placeholder = Placeholders.remainingTime(remaining, source);
 
         if (config.enableActionbarNotification()) {
-            player.sendActionBar(
-                    source.builder()
-                            .key(MessageKeys.NOTIFICATION_ACTIONBAR_REMAINING_TIME)
-                            .tagResolver(placeholder)
-                            .build()
-            );
+            MessageKeys.NOTIFICATION_ACTIONBAR_REMAINING_TIME.apply(remaining).source(source).sendActionBar(player);
         }
 
         if (config.notificationTime().contains(remaining)) {
-            source.builder()
-                    .key(MessageKeys.NOTIFICATION_MESSAGE_REMAINING)
-                    .tagResolver(placeholder)
-                    .send(player);
+            MessageKeys.NOTIFICATION_MESSAGE_REMAINING.apply(remaining).source(source).send(player);
         }
     }
 
@@ -56,10 +46,7 @@ public class TFlyEventListener implements Listener {
         var player = Bukkit.getPlayer(event.getPlayerUuid());
 
         if (player != null) {
-            localization.findSource(player.locale())
-                    .builder()
-                    .key(MessageKeys.NOTIFICATION_MESSAGE_STARTED)
-                    .send(player);
+            MessageKeys.NOTIFICATION_MESSAGE_STARTED.source(localization.findSource(player.locale())).send(player);
         }
     }
 
@@ -68,10 +55,7 @@ public class TFlyEventListener implements Listener {
         var player = Bukkit.getPlayer(event.getPlayerUuid());
 
         if (player != null) {
-            localization.findSource(player.locale())
-                    .builder()
-                    .key(MessageKeys.NOTIFICATION_MESSAGE_STOPPED)
-                    .send(player);
+            MessageKeys.NOTIFICATION_MESSAGE_STOPPED.source(localization.findSource(player.locale())).send(player);
         }
     }
 }

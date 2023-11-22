@@ -1,10 +1,9 @@
 package net.okocraft.tfly.command;
 
-import com.github.siroshun09.messages.api.localize.MiniMessageLocalization;
+import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
 import net.okocraft.tfly.command.subcommand.HelpCommand;
 import net.okocraft.tfly.command.subcommand.SubCommand;
 import net.okocraft.tfly.message.MessageKeys;
-import net.okocraft.tfly.message.Placeholders;
 import net.okocraft.tfly.util.LocaleUtils;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Contract;
@@ -76,7 +75,7 @@ public class TFlyCommand {
     }
 
     private void sendNoPermission(@NotNull CommandSender target, @NotNull Locale locale, @NotNull String permissionNode) {
-        localization.findSource(locale).builder().key(MessageKeys.NO_PERMISSION).tagResolver(Placeholders.permission(permissionNode)).send(target);
+        MessageKeys.NO_PERMISSION.apply(permissionNode).source(this.localization.findSource(locale)).send(target);
     }
 
     public @Nullable SubCommand getSubCommand(@NotNull String name) {

@@ -2,8 +2,8 @@ package net.okocraft.tfly;
 
 import com.github.siroshun09.messages.api.directory.DirectorySource;
 import com.github.siroshun09.messages.api.directory.LoadedMessageSource;
-import com.github.siroshun09.messages.api.localize.MiniMessageLocalization;
-import com.github.siroshun09.messages.api.source.MiniMessageSource;
+import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
+import com.github.siroshun09.messages.minimessage.source.MiniMessageSource;
 import com.github.siroshun09.messages.api.source.StringMessageMap;
 import com.github.siroshun09.messages.api.util.PropertiesFile;
 import net.okocraft.tfly.checker.LocationChecker;

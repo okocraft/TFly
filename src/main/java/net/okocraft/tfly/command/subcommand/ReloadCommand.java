@@ -1,14 +1,12 @@
 package net.okocraft.tfly.command.subcommand;
 
-import com.github.siroshun09.messages.api.builder.MiniMessageBuilder;
-import com.github.siroshun09.messages.api.localize.MiniMessageLocalization;
-import net.okocraft.tfly.message.HelpFactory;
+import com.github.siroshun09.messages.minimessage.base.MiniMessageBase;
+import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
 import net.okocraft.tfly.message.MessageKeys;
 import net.okocraft.tfly.util.LocaleUtils;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Locale;
 import java.util.function.BooleanSupplier;
 
 public class ReloadCommand implements SubCommand {
@@ -22,12 +20,8 @@ public class ReloadCommand implements SubCommand {
     }
 
     @Override
-    public @NotNull MiniMessageBuilder help(@NotNull Locale locale) {
-        return HelpFactory.create(
-                localization.findSource(locale),
-                MessageKeys.COMMAND_RELOAD_HELP,
-                MessageKeys.COMMAND_RELOAD_COMMANDLINE
-        );
+    public @NotNull MiniMessageBase help() {
+        return MessageKeys.COMMAND_RELOAD_HELP;
     }
 
     @Override
@@ -43,7 +37,7 @@ public class ReloadCommand implements SubCommand {
             success = reloading.getAsBoolean();
         }
 
-        var messageKey = success ? MessageKeys.COMMAND_RELOAD_SUCCESS : MessageKeys.COMMAND_RELOAD_FAILURE;
-        sender.sendMessage(localization.findSource(LocaleUtils.getFrom(sender)).builder().key(messageKey).build());
+        var messageBase = success ? MessageKeys.COMMAND_RELOAD_SUCCESS : MessageKeys.COMMAND_RELOAD_FAILURE;
+        messageBase.source(localization.findSource(LocaleUtils.getFrom(sender))).send(sender);
     }
 }

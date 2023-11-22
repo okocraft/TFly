@@ -1,14 +1,13 @@
 package net.okocraft.tfly.command.subcommand;
 
-import com.github.siroshun09.messages.api.builder.MiniMessageBuilder;
-import com.github.siroshun09.messages.api.localize.MiniMessageLocalization;
+import com.github.siroshun09.messages.minimessage.base.MiniMessageBase;
+import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
+import com.github.siroshun09.messages.minimessage.source.MiniMessageSource;
 import net.okocraft.tfly.checker.LocationChecker;
 import net.okocraft.tfly.command.TFlyCommand;
 import net.okocraft.tfly.data.TFlyData;
 import net.okocraft.tfly.data.TFlyDataProvider;
-import net.okocraft.tfly.message.HelpFactory;
 import net.okocraft.tfly.message.MessageKeys;
-import net.okocraft.tfly.message.Placeholders;
 import net.okocraft.tfly.player.TFlyController;
 import net.okocraft.tfly.util.LocaleUtils;
 import org.bukkit.Bukkit;
@@ -16,8 +15,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Locale;
 
 public class ToggleCommand implements SubCommand {
 
@@ -46,8 +43,12 @@ public class ToggleCommand implements SubCommand {
     }
 
     @Override
-    public @NotNull MiniMessageBuilder help(@NotNull Locale locale) {
-        return HelpFactory.create(localization.findSource(locale), helpKey(), commandlineKey());
+    public @NotNull MiniMessageBase help() {
+        return switch (type) {
+            case PAUSE -> MessageKeys.COMMAND_PAUSE_HELP;
+            case RESUME -> MessageKeys.COMMAND_RESUME_HELP;
+            case TOGGLE -> MessageKeys.COMMAND_TOGGLE_HELP;
+        };
     }
 
     @Override
@@ -59,18 +60,14 @@ public class ToggleCommand implements SubCommand {
     @Override
     public void run(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
         boolean self = args.length == 1;
-        var locale = LocaleUtils.getFrom(sender);
+        var source = localization.findSource(LocaleUtils.getFrom(sender));
 
         if (!self && !sender.hasPermission(otherPermissionNode())) {
-            localization.findSource(locale)
-                    .builder()
-                    .key(MessageKeys.NO_PERMISSION)
-                    .tagResolver(Placeholders.permission(otherPermissionNode()))
-                    .send(sender);
+            MessageKeys.NO_PERMISSION.apply(otherPermissionNode()).source(source).send(sender);
             return;
         }
 
-        var target = getTargetFromSenderOrArgument(sender, self ? null : args[1]);
+        var target = getTargetFromSenderOrArgument(sender, self ? null : args[1], source);
 
         if (target == null) {
             return;
@@ -80,10 +77,7 @@ public class ToggleCommand implements SubCommand {
         var status = data.status();
 
         if (status == TFlyData.Status.STARTING || status == TFlyData.Status.STOPPING) {
-            localization.findSource(locale)
-                    .builder()
-                    .key(MessageKeys.COMMAND_TOGGLE_CANNOT_TOGGLE_NOW)
-                    .send(sender);
+            MessageKeys.COMMAND_TOGGLE_CANNOT_TOGGLE_NOW.source(source).send(sender);
             return;
         }
 
@@ -94,18 +88,18 @@ public class ToggleCommand implements SubCommand {
         };
 
         if (pause) {
-            pause(sender, target, data);
+            pause(sender, target, data, source);
         } else {
-            resume(sender, target, data);
+            resume(sender, target, data, source);
         }
     }
 
-    protected @Nullable Player getTargetFromSenderOrArgument(@NotNull CommandSender sender, @Nullable String playerName) {
+    protected @Nullable Player getTargetFromSenderOrArgument(@NotNull CommandSender sender, @Nullable String playerName, @NotNull MiniMessageSource source) {
         if (playerName == null || playerName.isEmpty()) { // /tfly <cmd>
             if (sender instanceof Player player) {
                 return player;
             } else {
-                help(LocaleUtils.getFrom(sender)).send(sender);
+                help().source(source).send(sender);
                 return null;
             }
         } else { // /tfly <cmd> <player>
@@ -114,89 +108,52 @@ public class ToggleCommand implements SubCommand {
             if (target != null) {
                 return target;
             } else {
-                localization.findSource(LocaleUtils.getFrom(sender))
-                        .builder()
-                        .key(MessageKeys.COMMAND_GENERAL_PLAYER_NOT_FOUND)
-                        .tagResolvers(Placeholders.player(playerName))
-                        .send(sender);
+                MessageKeys.COMMAND_GENERAL_PLAYER_NOT_FOUND.apply(playerName).source(source).send(sender);
                 return null;
             }
         }
     }
 
-    private void pause(@NotNull CommandSender sender, @NotNull Player target, @NotNull TFlyData data) {
+    private void pause(@NotNull CommandSender sender, @NotNull Player target, @NotNull TFlyData data, @NotNull MiniMessageSource source) {
         if (data.statusIf(status -> status == TFlyData.Status.RUNNING || status == TFlyData.Status.STARTING, TFlyData.Status.STOPPING)) {
             controller.stop(target, true);
         } else {
-            var builder = localization.findSource(LocaleUtils.getFrom(sender)).builder();
-
             if (sender == target) {
-                builder.key(MessageKeys.COMMAND_PAUSE_ALREADY_STOPPED_SELF);
+                MessageKeys.COMMAND_PAUSE_ALREADY_STOPPED_SELF.source(source).send(sender);
             } else {
-                builder.key(MessageKeys.COMMAND_PAUSE_ALREADY_STOPPED_OTHER).tagResolver(Placeholders.player(target.getName()));
+                MessageKeys.COMMAND_PAUSE_ALREADY_STOPPED_OTHER.apply(target.getName()).source(source).send(sender);
             }
-
-            builder.send(sender);
         }
     }
 
-    private void resume(@NotNull CommandSender sender, @NotNull Player target, @NotNull TFlyData data) {
+    private void resume(@NotNull CommandSender sender, @NotNull Player target, @NotNull TFlyData data, @NotNull MiniMessageSource source) {
         if (!locationChecker.test(target)) {
-            var builder = localization.findSource(LocaleUtils.getFrom(sender)).builder();
-
             if (sender == target) {
-                builder.key(MessageKeys.COMMAND_RESUME_CANNOT_FLY_SELF);
+                MessageKeys.COMMAND_RESUME_CANNOT_FLY_SELF.source(source).send(sender);
             } else {
-                builder.key(MessageKeys.COMMAND_RESUME_CANNOT_FLY_OTHER).tagResolver(Placeholders.player(target.getName()));
+                MessageKeys.COMMAND_RESUME_CANNOT_FLY_OTHER.apply(target.getName()).source(source).send(sender);
             }
-
-            builder.send(sender);
             return;
         }
 
         if (data.remainingTime() < 1) {
-            var builder = localization.findSource(LocaleUtils.getFrom(sender)).builder();
-
             if (sender == target) {
-                builder.key(MessageKeys.COMMAND_RESUME_NO_REMAINING_TIME_SELF);
+                MessageKeys.COMMAND_RESUME_NO_REMAINING_TIME_SELF.source(source).send(sender);
             } else {
-                builder.key(MessageKeys.COMMAND_RESUME_NO_REMAINING_TIME_OTHER).tagResolver(Placeholders.player(target.getName()));
+                MessageKeys.COMMAND_RESUME_NO_REMAINING_TIME_OTHER.apply(target.getName()).source(source).send(sender);
             }
-
-            builder.send(sender);
             return;
         }
 
         if (data.statusIf(status -> status == TFlyData.Status.STOPPED, TFlyData.Status.STARTING)) {
             controller.start(target);
         } else {
-            var builder = localization.findSource(LocaleUtils.getFrom(sender)).builder();
-
             if (sender == target) {
-                builder.key(MessageKeys.COMMAND_RESUME_ALREADY_RUNNING_SELF);
+                MessageKeys.COMMAND_RESUME_ALREADY_RUNNING_SELF.source(source).send(sender);
             } else {
-                builder.key(MessageKeys.COMMAND_RESUME_ALREADY_RUNNING_OTHER)
-                        .tagResolver(Placeholders.player(target.getName()));
+                MessageKeys.COMMAND_RESUME_ALREADY_RUNNING_OTHER.apply(target.getName()).source(source).send(sender);
             }
-
-            builder.send(sender);
         }
-    }
-
-    private @NotNull String helpKey() {
-        return switch (type) {
-            case PAUSE -> MessageKeys.COMMAND_PAUSE_HELP;
-            case RESUME -> MessageKeys.COMMAND_RESUME_HELP;
-            case TOGGLE -> MessageKeys.COMMAND_TOGGLE_HELP;
-        };
-    }
-
-    private @NotNull String commandlineKey() {
-        return switch (type) {
-            case PAUSE -> MessageKeys.COMMAND_PAUSE_COMMANDLINE;
-            case RESUME -> MessageKeys.COMMAND_RESUME_COMMANDLINE;
-            case TOGGLE -> MessageKeys.COMMAND_TOGGLE_COMMANDLINE;
-        };
     }
 
     private @NotNull String otherPermissionNode() {

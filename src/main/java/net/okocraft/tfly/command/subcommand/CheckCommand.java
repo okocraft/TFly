@@ -1,12 +1,10 @@
 package net.okocraft.tfly.command.subcommand;
 
-import com.github.siroshun09.messages.api.builder.MiniMessageBuilder;
-import com.github.siroshun09.messages.api.localize.MiniMessageLocalization;
+import com.github.siroshun09.messages.minimessage.base.MiniMessageBase;
+import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
 import net.okocraft.tfly.data.TFlyData;
 import net.okocraft.tfly.data.TFlyDataProvider;
-import net.okocraft.tfly.message.HelpFactory;
 import net.okocraft.tfly.message.MessageKeys;
-import net.okocraft.tfly.message.Placeholders;
 import net.okocraft.tfly.util.LocaleUtils;
 import net.okocraft.tfly.util.TabCompletionUtils;
 import org.bukkit.Bukkit;
@@ -15,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 public class CheckCommand implements SubCommand {
 
@@ -28,12 +25,8 @@ public class CheckCommand implements SubCommand {
     }
 
     @Override
-    public @NotNull MiniMessageBuilder help(@NotNull Locale locale) {
-        return HelpFactory.create(
-                localization.findSource(locale),
-                MessageKeys.COMMAND_CHECK_HELP,
-                MessageKeys.COMMAND_CHECK_COMMANDLINE
-        );
+    public @NotNull MiniMessageBase help() {
+        return MessageKeys.COMMAND_CHECK_HELP;
     }
 
     @Override
@@ -43,40 +36,32 @@ public class CheckCommand implements SubCommand {
 
     @Override
     public void run(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
-        var locale = LocaleUtils.getFrom(sender);
+        var source = localization.findSource(LocaleUtils.getFrom(sender));
 
         if (args.length < 2) {
-            help(locale).send(sender);
+            help().source(source).send(sender);
             return;
         }
 
         var target = Bukkit.getPlayer(args[1]);
 
         if (target == null) {
-            localization.findSource(locale)
-                    .builder()
-                    .key(MessageKeys.COMMAND_GENERAL_PLAYER_NOT_FOUND)
-                    .tagResolver(Placeholders.player(args[1]))
-                    .send(sender);
+            MessageKeys.COMMAND_GENERAL_PLAYER_NOT_FOUND.apply(args[1]).source(source).send(sender);
             return;
         }
 
         var data = dataProvider.getIfLoaded(target.getUniqueId());
-        var source = localization.findSource(locale);
-        var builder = source.builder().tagResolver(Placeholders.player(target.getName()));
 
         if (data != null && data.status() == TFlyData.Status.RUNNING) {
-            builder.key(MessageKeys.COMMAND_CHECK_FLYING).tagResolver(Placeholders.remainingTime(data.remainingTime(), source));
+            MessageKeys.COMMAND_CHECK_FLYING.apply(target.getName(), data.remainingTime()).source(source).send(sender);
             return;
         }
 
         if (target.isFlying()) {
-            builder.key(MessageKeys.COMMAND_CHECK_FLYING_BUT_NOT_TFLY);
+            MessageKeys.COMMAND_CHECK_FLYING_BUT_NOT_TFLY.apply(target.getName()).source(source).send(sender);
         } else {
-            builder.key(MessageKeys.COMMAND_CHECK_NOT_FLYING);
+            MessageKeys.COMMAND_CHECK_NOT_FLYING.apply(target.getName()).source(source).send(sender);
         }
-
-        builder.send(sender);
     }
 
     @Override

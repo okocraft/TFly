@@ -1,11 +1,11 @@
 package net.okocraft.tfly.hook;
 
-import com.github.siroshun09.messages.api.localize.MiniMessageLocalization;
+import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
 import io.papermc.paper.plugin.configuration.PluginMeta;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.okocraft.tfly.data.TFlyDataProvider;
-import net.okocraft.tfly.message.Placeholders;
+import net.okocraft.tfly.message.MessageKeys;
 import net.okocraft.tfly.util.LocaleUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -81,12 +81,7 @@ public final class PlaceholderAPIHook {
                 remainingTime = 0;
             }
 
-            return PlainTextComponentSerializer.plainText().serialize(
-                    Placeholders.remainingTimeComponent(
-                            remainingTime,
-                            localization.findSource(LocaleUtils.getFrom(player))
-                    )
-            );
+            return PlainTextComponentSerializer.plainText().serialize(MessageKeys.formatTime(remainingTime,localization.findSource(LocaleUtils.getFrom(player))));
         }
     }
 }
