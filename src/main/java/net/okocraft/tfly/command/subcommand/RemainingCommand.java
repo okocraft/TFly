@@ -4,7 +4,6 @@ import com.github.siroshun09.messages.minimessage.base.MiniMessageBase;
 import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
 import net.okocraft.tfly.data.TFlyDataProvider;
 import net.okocraft.tfly.message.MessageKeys;
-import net.okocraft.tfly.util.LocaleUtils;
 import net.okocraft.tfly.util.TabCompletionUtils;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +31,7 @@ public class RemainingCommand extends AbstractTFlyDataCommand {
     @Override
     public void run(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
         boolean self = args.length == 1;
-        var source = this.localization.findSource(LocaleUtils.getFrom(sender));
+        var source = this.localization.findSource(sender);
 
         if (!self && !sender.hasPermission(otherPermissionNode())) {
             MessageKeys.NO_PERMISSION.apply(otherPermissionNode()).source(source).send(sender);

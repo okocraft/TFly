@@ -4,7 +4,6 @@ import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocali
 import net.okocraft.tfly.command.subcommand.HelpCommand;
 import net.okocraft.tfly.command.subcommand.SubCommand;
 import net.okocraft.tfly.message.MessageKeys;
-import net.okocraft.tfly.util.LocaleUtils;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -30,10 +29,8 @@ public class TFlyCommand {
     }
 
     public void run(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
-        var locale = LocaleUtils.getFrom(sender);
-
         if (!sender.hasPermission("tfly.command")) {
-            sendNoPermission(sender, locale, "tfly.command");
+            sendNoPermission(sender, "tfly.command");
             return;
         }
 
@@ -48,7 +45,7 @@ public class TFlyCommand {
         if (sender.hasPermission(subCommand.permissionNode())) {
             subCommand.run(sender, args);
         } else {
-            sendNoPermission(sender, locale, subCommand.permissionNode());
+            sendNoPermission(sender, subCommand.permissionNode());
         }
     }
 
@@ -74,8 +71,8 @@ public class TFlyCommand {
         }
     }
 
-    private void sendNoPermission(@NotNull CommandSender target, @NotNull Locale locale, @NotNull String permissionNode) {
-        MessageKeys.NO_PERMISSION.apply(permissionNode).source(this.localization.findSource(locale)).send(target);
+    private void sendNoPermission(@NotNull CommandSender target, @NotNull String permissionNode) {
+        MessageKeys.NO_PERMISSION.apply(permissionNode).source(this.localization.findSource(target)).send(target);
     }
 
     public @Nullable SubCommand getSubCommand(@NotNull String name) {

@@ -9,7 +9,6 @@ import net.okocraft.tfly.data.TFlyData;
 import net.okocraft.tfly.data.TFlyDataProvider;
 import net.okocraft.tfly.message.MessageKeys;
 import net.okocraft.tfly.player.TFlyController;
-import net.okocraft.tfly.util.LocaleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -60,7 +59,7 @@ public class ToggleCommand implements SubCommand {
     @Override
     public void run(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
         boolean self = args.length == 1;
-        var source = localization.findSource(LocaleUtils.getFrom(sender));
+        var source = localization.findSource(sender);
 
         if (!self && !sender.hasPermission(otherPermissionNode())) {
             MessageKeys.NO_PERMISSION.apply(otherPermissionNode()).source(source).send(sender);

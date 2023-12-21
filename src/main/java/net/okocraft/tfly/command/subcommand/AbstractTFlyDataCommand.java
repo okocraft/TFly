@@ -5,7 +5,6 @@ import com.github.siroshun09.messages.minimessage.source.MiniMessageSource;
 import net.okocraft.tfly.data.TFlyData;
 import net.okocraft.tfly.data.TFlyDataProvider;
 import net.okocraft.tfly.message.MessageKeys;
-import net.okocraft.tfly.util.LocaleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -26,8 +25,9 @@ abstract class AbstractTFlyDataCommand implements SubCommand {
     }
 
     protected @Nullable TFlyData getTFlyDataFromSenderOrArgument(@NotNull CommandSender sender, @Nullable String playerName) {
+        var source = localization.findSource(sender);
+
         UUID target;
-        var source = localization.findSource(LocaleUtils.getFrom(sender));
 
         if (playerName == null || playerName.isEmpty()) { // /tfly <cmd>
             if (sender instanceof Player player) {

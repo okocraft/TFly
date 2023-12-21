@@ -4,7 +4,6 @@ import com.github.siroshun09.messages.minimessage.base.MiniMessageBase;
 import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
 import net.okocraft.tfly.data.TFlyDataProvider;
 import net.okocraft.tfly.message.MessageKeys;
-import net.okocraft.tfly.util.LocaleUtils;
 import net.okocraft.tfly.util.TabCompletionUtils;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +31,7 @@ public class SetCommand extends AbstractTFlyDataCommand {
     @SuppressWarnings("DuplicatedCode")
     @Override
     public void run(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
-        var source = localization.findSource(LocaleUtils.getFrom(sender));
+        var source = localization.findSource(sender);
 
         if (args.length < 3) {
             help().source(source).send(sender);

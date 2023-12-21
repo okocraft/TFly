@@ -23,6 +23,7 @@ import net.okocraft.tfly.listener.TFlyEventListener;
 import net.okocraft.tfly.message.MessageKeys;
 import net.okocraft.tfly.player.TFlyController;
 import net.okocraft.tfly.scheduler.Scheduler;
+import net.okocraft.tfly.util.LocaleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -164,7 +165,7 @@ public class TFlyPlugin extends JavaPlugin {
 
     private void loadMessages() throws IOException {
         if (this.localization == null) { // on startup
-            this.localization = new MiniMessageLocalization(MiniMessageSource.create(StringMessageMap.create(MessageKeys.defaultMessages())));
+            this.localization = new MiniMessageLocalization(MiniMessageSource.create(StringMessageMap.create(MessageKeys.defaultMessages())), LocaleUtils::getFrom);
         } else { // on reload
             this.localization.clearSources();
         }

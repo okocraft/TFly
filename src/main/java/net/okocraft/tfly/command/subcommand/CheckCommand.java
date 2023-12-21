@@ -5,7 +5,6 @@ import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocali
 import net.okocraft.tfly.data.TFlyData;
 import net.okocraft.tfly.data.TFlyDataProvider;
 import net.okocraft.tfly.message.MessageKeys;
-import net.okocraft.tfly.util.LocaleUtils;
 import net.okocraft.tfly.util.TabCompletionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -36,7 +35,7 @@ public class CheckCommand implements SubCommand {
 
     @Override
     public void run(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
-        var source = localization.findSource(LocaleUtils.getFrom(sender));
+        var source = localization.findSource(sender);
 
         if (args.length < 2) {
             help().source(source).send(sender);
