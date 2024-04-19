@@ -75,7 +75,7 @@
         <dependency>
             <groupId>com.github.siroshun09.messages</groupId>
             <artifactId>messages-minimessage</artifactId>
-            <version>0.5.0</version>
+            <version>0.6.0</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
