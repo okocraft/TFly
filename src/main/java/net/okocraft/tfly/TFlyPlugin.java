@@ -169,13 +169,10 @@ public class TFlyPlugin extends JavaPlugin {
             this.localization.clearSources();
         }
 
-        DirectorySource.forStringMessageMap(this.getDataFolder().toPath().resolve("languages"))
-                .fileExtension(PropertiesFile.FILE_EXTENSION)
+        DirectorySource.propertiesFiles(this.getDataFolder().toPath().resolve("languages"))
                 .defaultLocale(Locale.ENGLISH, Locale.JAPANESE)
-                .messageLoader(PropertiesFile.DEFAULT_LOADER)
-                .messageProcessor(MessageProcessors.appendMissingStringMessages(this::loadDefaultMessageMap, PropertiesFile.DEFAULT_APPENDER))
-                .messageProcessor(loaded -> MiniMessageSource.create(loaded.messageSource()))
-                .load(loaded -> this.localization.addSource(loaded.locale(), loaded.messageSource()));
+                .messageProcessor(MessageProcessors.appendMissingMessagesToPropertiesFile(this::loadDefaultMessageMap))
+                .load(loaded -> this.localization.addSource(loaded.locale(), MiniMessageSource.create(loaded.messageSource())));
     }
 
     private @Nullable Map<String, String> loadDefaultMessageMap(@NotNull Locale locale) throws IOException {
