@@ -1,11 +1,9 @@
 package net.okocraft.tfly;
 
-import com.github.siroshun09.messages.api.directory.DirectorySource;
-import com.github.siroshun09.messages.api.directory.MessageProcessors;
-import com.github.siroshun09.messages.api.source.StringMessageMap;
-import com.github.siroshun09.messages.api.util.PropertiesFile;
-import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
-import com.github.siroshun09.messages.minimessage.source.MiniMessageSource;
+import dev.siroshun.mcmsgdef.directory.DirectorySource;
+import dev.siroshun.mcmsgdef.directory.MessageProcessors;
+import dev.siroshun.mcmsgdef.file.PropertiesFile;
+import net.kyori.adventure.key.Key;
 import net.okocraft.tfly.checker.LocationChecker;
 import net.okocraft.tfly.command.TFlyCommand;
 import net.okocraft.tfly.command.subcommand.AddCommand;
@@ -23,7 +21,6 @@ import net.okocraft.tfly.listener.TFlyEventListener;
 import net.okocraft.tfly.message.MessageKeys;
 import net.okocraft.tfly.player.TFlyController;
 import net.okocraft.tfly.scheduler.Scheduler;
-import net.okocraft.tfly.util.LocaleUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -52,7 +49,6 @@ public class TFlyPlugin extends JavaPlugin {
     private final LocationChecker locationChecker;
 
     private boolean canEnable = false;
-    private MiniMessageLocalization localization;
     private TFlyCommand command;
 
     public TFlyPlugin() {
@@ -92,17 +88,17 @@ public class TFlyPlugin extends JavaPlugin {
         dataProvider.init(TFlyDataStorage.create(this));
         dataProvider.scheduleSaveTask(scheduler);
 
-        getServer().getPluginManager().registerEvents(new TFlyEventListener(config, localization), this);
+        getServer().getPluginManager().registerEvents(new TFlyEventListener(config), this);
         getServer().getPluginManager().registerEvents(new PlayerMonitor(scheduler, dataProvider, controller, locationChecker), this);
 
         command =
-                new TFlyCommand(localization)
-                        .addSubCommand("remaining", new RemainingCommand(localization, dataProvider))
-                        .addSubCommand("add", new AddCommand(localization, dataProvider))
-                        .addSubCommand("set", new SetCommand(localization, dataProvider))
-                        .addSubCommand("check", new CheckCommand(localization, dataProvider))
-                        .addSubCommand("reload", new ReloadCommand(localization, this::reload));
-        ToggleCommand.registerAll(command, localization, dataProvider, controller, locationChecker);
+                new TFlyCommand()
+                        .addSubCommand("remaining", new RemainingCommand(dataProvider))
+                        .addSubCommand("add", new AddCommand(dataProvider))
+                        .addSubCommand("set", new SetCommand(dataProvider))
+                        .addSubCommand("check", new CheckCommand(dataProvider))
+                        .addSubCommand("reload", new ReloadCommand(this::reload));
+        ToggleCommand.registerAll(command, dataProvider, controller, locationChecker);
 
         scheduler.runDelayedTask(this::hookPlaceholderAPI, 1);
     }
@@ -138,7 +134,7 @@ public class TFlyPlugin extends JavaPlugin {
     @SuppressWarnings("UnstableApiUsage")
     private void hookPlaceholderAPI() {
         if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            PlaceholderAPIHook.register(getPluginMeta(), localization, dataProvider);
+            PlaceholderAPIHook.register(getPluginMeta(), dataProvider);
         }
     }
 
@@ -163,16 +159,10 @@ public class TFlyPlugin extends JavaPlugin {
     }
 
     private void loadMessages() throws IOException {
-        if (this.localization == null) { // on startup
-            this.localization = new MiniMessageLocalization(MiniMessageSource.create(StringMessageMap.create(MessageKeys.defaultMessages())), LocaleUtils::getFrom);
-        } else { // on reload
-            this.localization.clearSources();
-        }
-
         DirectorySource.propertiesFiles(this.getDataFolder().toPath().resolve("languages"))
                 .defaultLocale(Locale.ENGLISH, Locale.JAPANESE)
                 .messageProcessor(MessageProcessors.appendMissingMessagesToPropertiesFile(this::loadDefaultMessageMap))
-                .load(loaded -> this.localization.addSource(loaded.locale(), MiniMessageSource.create(loaded.messageSource())));
+                .loadAndRegister(Key.key("tfly", "languages"));
     }
 
     private @Nullable Map<String, String> loadDefaultMessageMap(@NotNull Locale locale) throws IOException {

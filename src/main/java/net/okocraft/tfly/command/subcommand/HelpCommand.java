@@ -1,8 +1,7 @@
 package net.okocraft.tfly.command.subcommand;
 
-import com.github.siroshun09.messages.minimessage.base.MiniMessageBase;
-import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.okocraft.tfly.message.MessageKeys;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -12,17 +11,14 @@ import java.util.stream.Stream;
 
 public class HelpCommand implements SubCommand {
 
-    private final MiniMessageLocalization localization;
     private final Supplier<Stream<? extends SubCommand>> subCommandStreamSupplier;
 
-    public HelpCommand(@NotNull MiniMessageLocalization localization,
-                       @NotNull Supplier<Stream<? extends SubCommand>> subCommandStreamSupplier) {
-        this.localization = localization;
+    public HelpCommand(@NotNull Supplier<Stream<? extends SubCommand>> subCommandStreamSupplier) {
         this.subCommandStreamSupplier = subCommandStreamSupplier;
     }
 
     @Override
-    public @NotNull MiniMessageBase help() {
+    public @NotNull Component help() {
         return MessageKeys.COMMAND_HELP_HELP;
     }
 
@@ -33,13 +29,12 @@ public class HelpCommand implements SubCommand {
 
     @Override
     public void run(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
-        var source = localization.findSource(sender);
-        var result = Component.text().append(MessageKeys.COMMAND_HELP_HEADER.create(source));
+        TextComponent.Builder result = Component.text().append(MessageKeys.COMMAND_HELP_HEADER);
 
-        subCommandStreamSupplier.get()
+        this.subCommandStreamSupplier.get()
                 .filter(cmd -> sender.hasPermission(cmd.permissionNode()))
                 .map(SubCommand::help)
-                .forEach(help -> result.append(Component.newline()).append(help.create(source)));
+                .forEach(help -> result.append(Component.newline()).append(help));
 
         sender.sendMessage(result);
     }

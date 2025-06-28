@@ -1,9 +1,11 @@
 package net.okocraft.tfly.hook;
 
-import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
 import io.papermc.paper.plugin.configuration.PluginMeta;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.kyori.adventure.translation.GlobalTranslator;
+import net.okocraft.tfly.data.TFlyData;
 import net.okocraft.tfly.data.TFlyDataProvider;
 import net.okocraft.tfly.message.MessageKeys;
 import org.bukkit.entity.Player;
@@ -15,9 +17,9 @@ public final class PlaceholderAPIHook {
 
     private static Expansion expansion = null;
 
-    public static void register(@NotNull PluginMeta pluginMeta, @NotNull MiniMessageLocalization localization, @NotNull TFlyDataProvider dataProvider) {
+    public static void register(@NotNull PluginMeta pluginMeta, @NotNull TFlyDataProvider dataProvider) {
         if (expansion == null) {
-            expansion = new Expansion(pluginMeta, localization, dataProvider);
+            expansion = new Expansion(pluginMeta, dataProvider);
             expansion.register();
         }
     }
@@ -35,12 +37,10 @@ public final class PlaceholderAPIHook {
     private static class Expansion extends PlaceholderExpansion {
 
         private final PluginMeta pluginMeta;
-        private final MiniMessageLocalization localization;
         private final TFlyDataProvider dataProvider;
 
-        private Expansion(@NotNull PluginMeta pluginMeta, @NotNull MiniMessageLocalization localization, @NotNull TFlyDataProvider dataProvider) {
+        private Expansion(@NotNull PluginMeta pluginMeta, @NotNull TFlyDataProvider dataProvider) {
             this.pluginMeta = pluginMeta;
-            this.localization = localization;
             this.dataProvider = dataProvider;
         }
 
@@ -71,16 +71,15 @@ public final class PlaceholderAPIHook {
 
         @Override
         public @Nullable String onPlaceholderRequest(Player player, @NotNull String params) {
-            long remainingTime;
-
-            if (player != null) {
-                var data = dataProvider.getIfLoaded(player.getUniqueId());
-                remainingTime = data != null ? data.remainingTime() : 0;
-            } else {
-                remainingTime = 0;
+            if (player == null) {
+                return "";
             }
 
-            return PlainTextComponentSerializer.plainText().serialize(MessageKeys.formatTime(remainingTime,localization.findSource(player)));
+            TFlyData data = this.dataProvider.getIfLoaded(player.getUniqueId());
+            long remainingTime = data != null ? data.remainingTime() : 0;
+
+            Component translated = GlobalTranslator.render(MessageKeys.formatTime(remainingTime).asComponent(), player.locale());
+            return PlainTextComponentSerializer.plainText().serialize(translated);
         }
     }
 }

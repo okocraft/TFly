@@ -1,8 +1,6 @@
 package net.okocraft.tfly.command.subcommand;
 
-import com.github.siroshun09.messages.minimessage.base.MiniMessageBase;
-import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
-import com.github.siroshun09.messages.minimessage.source.MiniMessageSource;
+import net.kyori.adventure.text.Component;
 import net.okocraft.tfly.checker.LocationChecker;
 import net.okocraft.tfly.command.TFlyCommand;
 import net.okocraft.tfly.data.TFlyData;
@@ -17,24 +15,21 @@ import org.jetbrains.annotations.Nullable;
 
 public class ToggleCommand implements SubCommand {
 
-    public static void registerAll(@NotNull TFlyCommand command, @NotNull MiniMessageLocalization localization, @NotNull TFlyDataProvider dataProvider, @NotNull TFlyController controller, @NotNull LocationChecker locationChecker) {
-        command.addSubCommand("toggle", new ToggleCommand(localization, dataProvider, controller, locationChecker, Type.TOGGLE))
-                .addSubCommand("pause", new ToggleCommand(localization, dataProvider, controller, locationChecker, Type.PAUSE))
-                .addSubCommand("resume", new ToggleCommand(localization, dataProvider, controller, locationChecker, Type.RESUME));
+    public static void registerAll(@NotNull TFlyCommand command, @NotNull TFlyDataProvider dataProvider, @NotNull TFlyController controller, @NotNull LocationChecker locationChecker) {
+        command.addSubCommand("toggle", new ToggleCommand(dataProvider, controller, locationChecker, Type.TOGGLE))
+                .addSubCommand("pause", new ToggleCommand(dataProvider, controller, locationChecker, Type.PAUSE))
+                .addSubCommand("resume", new ToggleCommand(dataProvider, controller, locationChecker, Type.RESUME));
     }
 
-    private final MiniMessageLocalization localization;
     private final TFlyDataProvider dataProvider;
     private final TFlyController controller;
     private final LocationChecker locationChecker;
     private final Type type;
 
-    private ToggleCommand(@NotNull MiniMessageLocalization localization,
-                          @NotNull TFlyDataProvider dataProvider,
+    private ToggleCommand(@NotNull TFlyDataProvider dataProvider,
                           @NotNull TFlyController controller,
                           @NotNull LocationChecker locationChecker,
                           @NotNull Type type) {
-        this.localization = localization;
         this.dataProvider = dataProvider;
         this.controller = controller;
         this.locationChecker = locationChecker;
@@ -42,7 +37,7 @@ public class ToggleCommand implements SubCommand {
     }
 
     @Override
-    public @NotNull MiniMessageBase help() {
+    public @NotNull Component help() {
         return switch (type) {
             case PAUSE -> MessageKeys.COMMAND_PAUSE_HELP;
             case RESUME -> MessageKeys.COMMAND_RESUME_HELP;
@@ -59,14 +54,12 @@ public class ToggleCommand implements SubCommand {
     @Override
     public void run(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
         boolean self = args.length == 1;
-        var source = localization.findSource(sender);
-
         if (!self && !sender.hasPermission(otherPermissionNode())) {
-            MessageKeys.NO_PERMISSION.apply(otherPermissionNode()).source(source).send(sender);
+            sender.sendMessage(MessageKeys.NO_PERMISSION.apply(otherPermissionNode()));
             return;
         }
 
-        var target = getTargetFromSenderOrArgument(sender, self ? null : args[1], source);
+        var target = getTargetFromSenderOrArgument(sender, self ? null : args[1]);
 
         if (target == null) {
             return;
@@ -76,7 +69,7 @@ public class ToggleCommand implements SubCommand {
         var status = data.status();
 
         if (status == TFlyData.Status.STARTING || status == TFlyData.Status.STOPPING) {
-            MessageKeys.COMMAND_TOGGLE_CANNOT_TOGGLE_NOW.source(source).send(sender);
+            sender.sendMessage(MessageKeys.COMMAND_TOGGLE_CANNOT_TOGGLE_NOW);
             return;
         }
 
@@ -87,18 +80,18 @@ public class ToggleCommand implements SubCommand {
         };
 
         if (pause) {
-            pause(sender, target, data, source);
+            pause(sender, target, data);
         } else {
-            resume(sender, target, data, source);
+            resume(sender, target, data);
         }
     }
 
-    protected @Nullable Player getTargetFromSenderOrArgument(@NotNull CommandSender sender, @Nullable String playerName, @NotNull MiniMessageSource source) {
+    protected @Nullable Player getTargetFromSenderOrArgument(@NotNull CommandSender sender, @Nullable String playerName) {
         if (playerName == null || playerName.isEmpty()) { // /tfly <cmd>
             if (sender instanceof Player player) {
                 return player;
             } else {
-                help().source(source).send(sender);
+                sender.sendMessage(this.help());
                 return null;
             }
         } else { // /tfly <cmd> <player>
@@ -107,39 +100,39 @@ public class ToggleCommand implements SubCommand {
             if (target != null) {
                 return target;
             } else {
-                MessageKeys.COMMAND_GENERAL_PLAYER_NOT_FOUND.apply(playerName).source(source).send(sender);
+                sender.sendMessage(MessageKeys.COMMAND_GENERAL_PLAYER_NOT_FOUND.apply(playerName));
                 return null;
             }
         }
     }
 
-    private void pause(@NotNull CommandSender sender, @NotNull Player target, @NotNull TFlyData data, @NotNull MiniMessageSource source) {
+    private void pause(@NotNull CommandSender sender, @NotNull Player target, @NotNull TFlyData data) {
         if (data.statusIf(status -> status == TFlyData.Status.RUNNING || status == TFlyData.Status.STARTING, TFlyData.Status.STOPPING)) {
             controller.stop(target, true);
         } else {
             if (sender == target) {
-                MessageKeys.COMMAND_PAUSE_ALREADY_STOPPED_SELF.source(source).send(sender);
+                sender.sendMessage(MessageKeys.COMMAND_PAUSE_ALREADY_STOPPED_SELF);
             } else {
-                MessageKeys.COMMAND_PAUSE_ALREADY_STOPPED_OTHER.apply(target.getName()).source(source).send(sender);
+                sender.sendMessage(MessageKeys.COMMAND_PAUSE_ALREADY_STOPPED_OTHER.apply(target.getName()));
             }
         }
     }
 
-    private void resume(@NotNull CommandSender sender, @NotNull Player target, @NotNull TFlyData data, @NotNull MiniMessageSource source) {
+    private void resume(@NotNull CommandSender sender, @NotNull Player target, @NotNull TFlyData data) {
         if (!locationChecker.test(target)) {
             if (sender == target) {
-                MessageKeys.COMMAND_RESUME_CANNOT_FLY_SELF.source(source).send(sender);
+                sender.sendMessage(MessageKeys.COMMAND_RESUME_CANNOT_FLY_SELF);
             } else {
-                MessageKeys.COMMAND_RESUME_CANNOT_FLY_OTHER.apply(target.getName()).source(source).send(sender);
+                sender.sendMessage(MessageKeys.COMMAND_RESUME_CANNOT_FLY_OTHER.apply(target.getName()));
             }
             return;
         }
 
         if (data.remainingTime() < 1) {
             if (sender == target) {
-                MessageKeys.COMMAND_RESUME_NO_REMAINING_TIME_SELF.source(source).send(sender);
+                sender.sendMessage(MessageKeys.COMMAND_RESUME_NO_REMAINING_TIME_SELF);
             } else {
-                MessageKeys.COMMAND_RESUME_NO_REMAINING_TIME_OTHER.apply(target.getName()).source(source).send(sender);
+                sender.sendMessage(MessageKeys.COMMAND_RESUME_NO_REMAINING_TIME_OTHER.apply(target.getName()));
             }
             return;
         }
@@ -148,9 +141,9 @@ public class ToggleCommand implements SubCommand {
             controller.start(target);
         } else {
             if (sender == target) {
-                MessageKeys.COMMAND_RESUME_ALREADY_RUNNING_SELF.source(source).send(sender);
+                sender.sendMessage(MessageKeys.COMMAND_RESUME_ALREADY_RUNNING_SELF);
             } else {
-                MessageKeys.COMMAND_RESUME_ALREADY_RUNNING_OTHER.apply(target.getName()).source(source).send(sender);
+                sender.sendMessage(MessageKeys.COMMAND_RESUME_ALREADY_RUNNING_OTHER.apply(target.getName()));
             }
         }
     }

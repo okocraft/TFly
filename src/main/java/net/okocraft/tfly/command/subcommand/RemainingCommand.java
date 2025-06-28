@@ -1,7 +1,6 @@
 package net.okocraft.tfly.command.subcommand;
 
-import com.github.siroshun09.messages.minimessage.base.MiniMessageBase;
-import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
+import net.kyori.adventure.text.Component;
 import net.okocraft.tfly.data.TFlyDataProvider;
 import net.okocraft.tfly.message.MessageKeys;
 import net.okocraft.tfly.util.TabCompletionUtils;
@@ -13,12 +12,12 @@ import java.util.List;
 
 public class RemainingCommand extends AbstractTFlyDataCommand {
 
-    public RemainingCommand(@NotNull MiniMessageLocalization localization, @NotNull TFlyDataProvider dataProvider) {
-        super(localization, dataProvider);
+    public RemainingCommand(@NotNull TFlyDataProvider dataProvider) {
+        super(dataProvider);
     }
 
     @Override
-    public @NotNull MiniMessageBase help() {
+    public @NotNull Component help() {
         return MessageKeys.COMMAND_REMAINING_HELP;
     }
 
@@ -30,11 +29,10 @@ public class RemainingCommand extends AbstractTFlyDataCommand {
     @SuppressWarnings("DuplicatedCode")
     @Override
     public void run(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
-        boolean self = args.length == 1;
-        var source = this.localization.findSource(sender);
+        boolean self = args.length == 1 || sender.getName().equalsIgnoreCase(args[1]);
 
         if (!self && !sender.hasPermission(otherPermissionNode())) {
-            MessageKeys.NO_PERMISSION.apply(otherPermissionNode()).source(source).send(sender);
+            sender.sendMessage(MessageKeys.NO_PERMISSION.apply(otherPermissionNode()));
             return;
         }
 
@@ -48,15 +46,15 @@ public class RemainingCommand extends AbstractTFlyDataCommand {
 
         if (remainingTime < 1) {
             if (self) {
-                MessageKeys.COMMAND_REMAINING_NO_TIME_SELF.source(source).send(sender);
+                sender.sendMessage(MessageKeys.COMMAND_REMAINING_NO_TIME_SELF);
             } else {
-                MessageKeys.COMMAND_REMAINING_NO_TIME_OTHER.apply(args[1]).source(source).send(sender);
+                sender.sendMessage(MessageKeys.COMMAND_REMAINING_NO_TIME_OTHER.apply(args[1]));
             }
         } else {
             if (self) {
-                MessageKeys.COMMAND_REMAINING_TIME_SELF.apply(remainingTime).source(source).send(sender);
+                sender.sendMessage(MessageKeys.COMMAND_REMAINING_TIME_SELF.apply(remainingTime));
             } else {
-                MessageKeys.COMMAND_REMAINING_TIME_OTHER.apply(args[1], remainingTime).source(source).send(sender);
+                sender.sendMessage(MessageKeys.COMMAND_REMAINING_TIME_OTHER.apply(args[1], remainingTime));
             }
         }
     }

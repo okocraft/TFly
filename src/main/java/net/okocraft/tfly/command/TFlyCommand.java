@@ -1,6 +1,5 @@
 package net.okocraft.tfly.command;
 
-import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
 import net.okocraft.tfly.command.subcommand.HelpCommand;
 import net.okocraft.tfly.command.subcommand.SubCommand;
 import net.okocraft.tfly.message.MessageKeys;
@@ -18,14 +17,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TFlyCommand {
 
     private final Map<String, SubCommand> subCommandMap = new ConcurrentHashMap<>();
-    private final MiniMessageLocalization localization;
     private final HelpCommand helpCommand;
 
-    public TFlyCommand(@NotNull MiniMessageLocalization localization) {
-        this.localization = localization;
-        this.helpCommand = new HelpCommand(localization, () -> subCommandMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(Map.Entry::getValue));
-
-        subCommandMap.put("help", helpCommand);
+    public TFlyCommand() {
+        this.helpCommand = new HelpCommand(() -> this.subCommandMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(Map.Entry::getValue));
+        this.subCommandMap.put("help", this.helpCommand);
     }
 
     public void run(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
@@ -37,9 +33,9 @@ public class TFlyCommand {
         SubCommand subCommand;
 
         if (args.length == 0) {
-            subCommand = helpCommand;
+            subCommand = this.helpCommand;
         } else {
-            subCommand = subCommandMap.getOrDefault(args[0].toLowerCase(Locale.ENGLISH), helpCommand);
+            subCommand = this.subCommandMap.getOrDefault(args[0].toLowerCase(Locale.ENGLISH), this.helpCommand);
         }
 
         if (sender.hasPermission(subCommand.permissionNode())) {
@@ -58,7 +54,7 @@ public class TFlyCommand {
             return subCommandMap.keySet()
                     .stream()
                     .filter(cmd -> cmd.startsWith(args[0].toLowerCase(Locale.ENGLISH)))
-                    .filter(cmd -> sender.hasPermission(subCommandMap.get(cmd).permissionNode()))
+                    .filter(cmd -> sender.hasPermission(this.subCommandMap.get(cmd).permissionNode()))
                     .toList();
         }
 
@@ -72,16 +68,16 @@ public class TFlyCommand {
     }
 
     private void sendNoPermission(@NotNull CommandSender target, @NotNull String permissionNode) {
-        MessageKeys.NO_PERMISSION.apply(permissionNode).source(this.localization.findSource(target)).send(target);
+        target.sendMessage(MessageKeys.NO_PERMISSION.apply(permissionNode));
     }
 
     public @Nullable SubCommand getSubCommand(@NotNull String name) {
-        return subCommandMap.get(name.toLowerCase(Locale.ENGLISH));
+        return this.subCommandMap.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Contract("_, _ -> this")
     public @NotNull TFlyCommand addSubCommand(@NotNull String name, @NotNull SubCommand subCommand) {
-        subCommandMap.put(name.toLowerCase(Locale.ENGLISH), subCommand);
+        this.subCommandMap.put(name.toLowerCase(Locale.ENGLISH), subCommand);
         return this;
     }
 }

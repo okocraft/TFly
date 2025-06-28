@@ -1,7 +1,6 @@
 package net.okocraft.tfly.command.subcommand;
 
-import com.github.siroshun09.messages.minimessage.base.MiniMessageBase;
-import com.github.siroshun09.messages.minimessage.localization.MiniMessageLocalization;
+import net.kyori.adventure.text.Component;
 import net.okocraft.tfly.data.TFlyData;
 import net.okocraft.tfly.data.TFlyDataProvider;
 import net.okocraft.tfly.message.MessageKeys;
@@ -15,16 +14,14 @@ import java.util.List;
 
 public class CheckCommand implements SubCommand {
 
-    private final MiniMessageLocalization localization;
     private final TFlyDataProvider dataProvider;
 
-    public CheckCommand(@NotNull MiniMessageLocalization localization, @NotNull TFlyDataProvider dataProvider) {
-        this.localization = localization;
+    public CheckCommand(@NotNull TFlyDataProvider dataProvider) {
         this.dataProvider = dataProvider;
     }
 
     @Override
-    public @NotNull MiniMessageBase help() {
+    public @NotNull Component help() {
         return MessageKeys.COMMAND_CHECK_HELP;
     }
 
@@ -35,31 +32,29 @@ public class CheckCommand implements SubCommand {
 
     @Override
     public void run(@NotNull CommandSender sender, @NotNull String @NotNull [] args) {
-        var source = localization.findSource(sender);
-
         if (args.length < 2) {
-            help().source(source).send(sender);
+            sender.sendMessage(this.help());
             return;
         }
 
         var target = Bukkit.getPlayer(args[1]);
 
         if (target == null) {
-            MessageKeys.COMMAND_GENERAL_PLAYER_NOT_FOUND.apply(args[1]).source(source).send(sender);
+            sender.sendMessage(MessageKeys.COMMAND_GENERAL_PLAYER_NOT_FOUND.apply(args[1]));
             return;
         }
 
         var data = dataProvider.getIfLoaded(target.getUniqueId());
 
         if (data != null && data.status() == TFlyData.Status.RUNNING) {
-            MessageKeys.COMMAND_CHECK_FLYING.apply(target.getName(), data.remainingTime()).source(source).send(sender);
+            sender.sendMessage(MessageKeys.COMMAND_CHECK_FLYING.apply(target.getName(), data.remainingTime()));
             return;
         }
 
         if (target.isFlying()) {
-            MessageKeys.COMMAND_CHECK_FLYING_BUT_NOT_TFLY.apply(target.getName()).source(source).send(sender);
+            sender.sendMessage(MessageKeys.COMMAND_CHECK_FLYING_BUT_NOT_TFLY.apply(target.getName()));
         } else {
-            MessageKeys.COMMAND_CHECK_NOT_FLYING.apply(target.getName()).source(source).send(sender);
+            sender.sendMessage(MessageKeys.COMMAND_CHECK_NOT_FLYING.apply(target.getName()));
         }
     }
 

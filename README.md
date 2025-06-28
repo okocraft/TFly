@@ -4,8 +4,8 @@ A Paper/Folia plugin to allow players time-limited flight.
 
 ## Requirements
 
-- Java 17
-- Paper 1.16+ / Folia
+- Java 21
+- Paper 1.21.4+ / Folia
 
 ## Installation
 
@@ -18,4 +18,4 @@ A Paper/Folia plugin to allow players time-limited flight.
 
 This project is under the GPL-3.0. Please check [LICENSE](LICENSE) for more info.
 
-Copyright © 2023, OKOCRAFT and Siroshun09
+Copyright © 2023-2025, OKOCRAFT and Siroshun09
