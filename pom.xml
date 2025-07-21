@@ -6,7 +6,7 @@
 
     <groupId>net.okocraft.tfly</groupId>
     <artifactId>tfly</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.3</version>
 
     <name>TFly</name>
     <url>https://github.com/okocraft/TFly</url>
