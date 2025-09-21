@@ -36,7 +36,7 @@ public class DatFileStorage implements TFlyDataFlatFileStorage {
         try (var reader = Files.newBufferedReader(filepath, StandardCharsets.UTF_8); var lines = reader.lines()) {
             lines.forEach(line -> processLine(line, dataMap));
         } catch (IOException | UncheckedIOException e) {
-            TFlyPlugin.logger().error("Could not load data from " + filepath.getFileName(), e);
+            TFlyPlugin.logger().error("Could not load data from {}", filepath.getFileName(), e);
             loadErrorOccurred = true;
         }
     }
@@ -46,7 +46,7 @@ public class DatFileStorage implements TFlyDataFlatFileStorage {
         try {
             saveAll0(dataMap);
         } catch (IOException e) {
-            TFlyPlugin.logger().error("Could not save data to " + filepath.getFileName(), e);
+            TFlyPlugin.logger().error("Could not save data to {}", filepath.getFileName(), e);
         }
     }
 
