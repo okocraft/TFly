@@ -2,6 +2,7 @@ package net.okocraft.tfly.message;
 
 import dev.siroshun.mcmsgdef.DefaultMessageDefiner;
 import dev.siroshun.mcmsgdef.MessageKey;
+import dev.siroshun.mcmsgdef.Placeholder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextComponent;
@@ -11,19 +12,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Map;
-import java.util.function.Function;
 
 public final class MessageKeys {
 
     private static final DefaultMessageDefiner DEFINER = DefaultMessageDefiner.create();
 
-    private static final Function<String, ComponentLike> PERMISSION_PLACEHOLDER = node -> Argument.string("permission", node);
-    private static final Function<String, ComponentLike> ARGUMENT_PLACEHOLDER = arg -> Argument.string("argument", arg);
-    private static final Function<String, ComponentLike> PLAYER_PLACEHOLDER = player -> Argument.string("player", player);
-    private static final Function<Long, ComponentLike> SECONDS_PLACEHOLDER = seconds -> Argument.numeric("seconds", seconds);
-    private static final Function<Long, ComponentLike> REMAINING_TIME_PLACEHOLDER = seconds -> Argument.component("remaining_time", formatTime(seconds));
-    private static final Function<MessageKey, ComponentLike> COMMANDLINE_PLACEHOLDER = key -> Argument.component("commandline", key.asComponent());
-    private static final Function<MessageKey, ComponentLike> HELP_PLACEHOLDER = key -> Argument.component("help", key.asComponent());
+    private static final Placeholder<String> PERMISSION_PLACEHOLDER = node -> Argument.string("permission", node);
+    private static final Placeholder<String> ARGUMENT_PLACEHOLDER = arg -> Argument.string("argument", arg);
+    private static final Placeholder<String> PLAYER_PLACEHOLDER = player -> Argument.string("player", player);
+    private static final Placeholder<Long> SECONDS_PLACEHOLDER = seconds -> Argument.numeric("seconds", seconds);
+    private static final Placeholder<Long> REMAINING_TIME_PLACEHOLDER = seconds -> Argument.component("remaining_time", formatTime(seconds));
+    private static final Placeholder<MessageKey> COMMANDLINE_PLACEHOLDER = key -> Argument.component("commandline", key.asComponent());
+    private static final Placeholder<MessageKey> HELP_PLACEHOLDER = key -> Argument.component("help", key.asComponent());
 
     public static final MessageKey.Arg1<String> NO_PERMISSION = DEFINER.define("no-permission", "<gray>You don't have the permission: <aqua><permission>").with(PERMISSION_PLACEHOLDER);
 
