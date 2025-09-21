@@ -119,7 +119,7 @@ public class TFlyPlugin extends JavaPlugin {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if (this.command != null) {
             scheduler.runAsyncTask(() -> this.command.run(sender, args));
         }
@@ -127,11 +127,10 @@ public class TFlyPlugin extends JavaPlugin {
     }
 
     @Override
-    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String @NotNull [] args) {
         return this.command != null ? this.command.tabComplete(sender, args) : Collections.emptyList();
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     private void hookPlaceholderAPI() {
         if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             PlaceholderAPIHook.register(getPluginMeta(), dataProvider);
