@@ -145,6 +145,7 @@ public class TFlyPlugin extends JavaPlugin {
 
     private boolean reload() {
         locationChecker.removeChecker(config.getWorldChecker());
+        reloadConfig();
         config.loadFrom(getConfig());
         locationChecker.addChecker(config.getWorldChecker());
 
