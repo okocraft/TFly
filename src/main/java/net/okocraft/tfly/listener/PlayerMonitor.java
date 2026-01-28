@@ -12,9 +12,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.jetbrains.annotations.NotNull;
-import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 
 public class PlayerMonitor implements Listener {
 
@@ -34,7 +34,7 @@ public class PlayerMonitor implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onSpawn(@NotNull PlayerSpawnLocationEvent event) {
+    public void onSpawn(@NotNull PlayerJoinEvent event) {
         scheduler.runPlayerTask(event.getPlayer(), this::startIfNotStoppedOnQuit);
     }
 
