@@ -4,7 +4,7 @@ A Paper/Folia plugin to allow players time-limited flight.
 
 ## Requirements
 
-- Java 21
+- Java 25
 - Paper 1.21.4+ / Folia
 
 ## Installation
