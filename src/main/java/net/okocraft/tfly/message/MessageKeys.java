@@ -121,7 +121,7 @@ public final class MessageKeys {
             result.append(secondArg.apply(seconds));
         }
 
-        return result.build();
+        return result;
     }
 
     private MessageKeys() {
