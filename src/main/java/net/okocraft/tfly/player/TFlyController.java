@@ -117,7 +117,12 @@ public class TFlyController {
 
             if (player == null || !player.getAllowFlight()) {
                 data.status(TFlyData.Status.STOPPED);
-                taskMap.remove(uuid).cancel();
+
+                var task = taskMap.remove(uuid);
+                if (task != null) {
+                    task.cancel();
+                }
+
                 new TFlyStoppedEvent(uuid, data).callEvent();
                 return;
             }
