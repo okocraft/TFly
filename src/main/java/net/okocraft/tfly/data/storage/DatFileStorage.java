@@ -65,6 +65,10 @@ public class DatFileStorage implements TFlyDataFlatFileStorage {
             }
         }
 
+        if (uuid == null) {
+            return;
+        }
+
         if (1 < elements.length) {
             try {
                 remainingTime = Math.max(0, Long.parseLong(elements[1]));

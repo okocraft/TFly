@@ -39,7 +39,7 @@ public class TFlyController {
         var uuid = player.getUniqueId();
         var data = dataProvider.getIfLoaded(uuid);
 
-        if (data == null || data.status(TFlyData.Status.RUNNING) != TFlyData.Status.STARTING) { // status already changed to RUNNING by another operation
+        if (data == null || !data.statusIf(status -> status == TFlyData.Status.STARTING, TFlyData.Status.RUNNING)) { // status already changed by another operation
             return;
         }
 
