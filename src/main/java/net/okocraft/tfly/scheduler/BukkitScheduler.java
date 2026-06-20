@@ -28,11 +28,6 @@ class BukkitScheduler implements Scheduler {
     }
 
     @Override
-    public void runAsyncTask(@NotNull Runnable task) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, task);
-    }
-
-    @Override
     public @NotNull CancellableTask scheduleRepeatingAsyncTask(@NotNull Runnable task, @NotNull Duration interval) {
         var ticks = Tick.tick().fromDuration(interval);
         return Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, task, ticks, ticks)::cancel;

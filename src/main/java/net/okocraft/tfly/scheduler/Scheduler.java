@@ -23,8 +23,6 @@ public interface Scheduler {
 
     void runDelayedTask(@NotNull Runnable task, long delay);
 
-    void runAsyncTask(@NotNull Runnable task);
-
     @NotNull CancellableTask scheduleRepeatingAsyncTask(@NotNull Runnable task, @NotNull Duration interval);
 
     void close();

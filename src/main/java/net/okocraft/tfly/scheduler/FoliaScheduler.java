@@ -28,11 +28,6 @@ class FoliaScheduler implements Scheduler {
     }
 
     @Override
-    public void runAsyncTask(@NotNull Runnable task) {
-        Bukkit.getAsyncScheduler().runNow(plugin, $ -> task.run());
-    }
-
-    @Override
     public @NotNull CancellableTask scheduleRepeatingAsyncTask(@NotNull Runnable task, @NotNull Duration interval) {
         return Bukkit.getAsyncScheduler().runAtFixedRate(plugin, $ -> task.run(), interval.toMillis(), interval.toMillis(), TimeUnit.MILLISECONDS)::cancel;
     }

@@ -111,6 +111,20 @@ public class TFlyController {
         taskMap.clear();
     }
 
+    public void handleQuit(@NotNull Player player) {
+        var uuid = player.getUniqueId();
+        var data = dataProvider.getIfLoaded(uuid);
+
+        if (data != null) {
+            data.statusIf(status -> status != TFlyData.Status.STOPPED, TFlyData.Status.STOPPED);
+        }
+
+        var task = taskMap.remove(uuid);
+        if (task != null) {
+            task.cancel();
+        }
+    }
+
     private void tick(@NotNull UUID uuid, @NotNull TFlyData data) {
         if (data.status() == TFlyData.Status.RUNNING) {
             var player = Bukkit.getPlayer(uuid);

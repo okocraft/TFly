@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,14 +50,7 @@ public class PlayerMonitor implements Listener {
             return;
         }
 
-        var uuid = player.getUniqueId();
-        var data = dataProvider.getIfLoaded(uuid);
-
-        if (data == null) {
-            scheduler.runAsyncTask(() -> startIfNotStoppedOnQuit(player, dataProvider.getOrLoad(uuid)));
-        } else {
-            startIfNotStoppedOnQuit(player, data);
-        }
+        startIfNotStoppedOnQuit(player, dataProvider.getOrLoad(player.getUniqueId()));
     }
 
     private void startIfNotStoppedOnQuit(@NotNull Player player, @NotNull TFlyData data) {
@@ -67,6 +61,11 @@ public class PlayerMonitor implements Listener {
         if (data.statusIf(status -> status == TFlyData.Status.STOPPED, TFlyData.Status.STARTING)) {
             controller.start(player);
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onQuit(@NotNull PlayerQuitEvent event) {
+        controller.handleQuit(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

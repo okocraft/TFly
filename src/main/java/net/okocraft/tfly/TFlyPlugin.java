@@ -121,7 +121,7 @@ public class TFlyPlugin extends JavaPlugin {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
         if (this.command != null) {
-            scheduler.runAsyncTask(() -> this.command.run(sender, args));
+            this.command.run(sender, args);
         }
         return true;
     }
