@@ -161,6 +161,7 @@ public class TFlyPlugin extends JavaPlugin {
     private void loadMessages() throws IOException {
         DirectorySource.propertiesFiles(this.getDataFolder().toPath().resolve("languages"))
                 .defaultLocale(Locale.ENGLISH, Locale.JAPANESE)
+                .primaryLocale(Locale.ENGLISH)
                 .messageProcessor(MessageProcessors.appendMissingMessagesToPropertiesFile(this::loadDefaultMessageMap))
                 .loadAndRegister(Key.key("tfly", "languages"));
     }
