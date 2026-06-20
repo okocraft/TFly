@@ -46,8 +46,12 @@ public class AddCommand extends AbstractTFlyDataCommand {
             return;
         }
 
-        long now = data.remainingTime(current -> current + Math.max(adding, 0));
-        sender.sendMessage(MessageKeys.COMMAND_ADD_SUCCESS.apply(Math.max(adding, 0), args[1], now));
+        long added = Math.max(adding, 0);
+        long now = data.remainingTime(current -> {
+            long sum = current + added;
+            return sum < current ? Long.MAX_VALUE : sum; // saturate on overflow
+        });
+        sender.sendMessage(MessageKeys.COMMAND_ADD_SUCCESS.apply(added, args[1], now));
     }
 
     @Override
