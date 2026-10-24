@@ -32,7 +32,7 @@ public final class MessageKeys {
     public static final MessageKey.Arg1<Long> NOTIFICATION_ACTIONBAR_REMAINING_TIME = DEFINER.define("notification.actionbar.remaining-time", "<yellow>Flight Mode: <aqua><remaining_time><yellow> left").with(REMAINING_TIME_PLACEHOLDER);
     public static final MessageKey.Arg1<Long> NOTIFICATION_MESSAGE_REMAINING = DEFINER.define("notification.message.remaining-time", "<gray>Your flight mode has <aqua><remaining_time><gray> remaining.").with(REMAINING_TIME_PLACEHOLDER);
 
-    public static final MessageKey.Arg1<String> COMMAND_GENERAL_PLAYER_NOT_FOUND = DEFINER.define("command.general.player-not-found", "<red>The player named <aqua><player><red> cannot be found.").with(ARGUMENT_PLACEHOLDER);
+    public static final MessageKey.Arg1<String> COMMAND_GENERAL_PLAYER_NOT_FOUND = DEFINER.define("command.general.player-not-found", "<red>The player named <aqua><player><red> cannot be found.").with(PLAYER_PLACEHOLDER);
     public static final MessageKey.Arg1<String> COMMAND_GENERAL_INVALID_NUMBER = DEFINER.define("command.general.invalid-number", "<aqua><argument><red> is not valid number.").with(ARGUMENT_PLACEHOLDER);
 
     public static final MessageKey COMMAND_HELP_HEADER = DEFINER.define("command.help.header", "<dark_gray><st>=========================<reset><gold><b> TFly <reset><dark_gray><st>=========================");
@@ -111,13 +111,13 @@ public final class MessageKeys {
 
         if (minutes != 0) {
             if (hours != 0) result.appendSpace();
-            var minuteArg = hours == 1 ? REMAINING_TIME_MINUTE : REMAINING_TIME_MINUTES;
+            var minuteArg = minutes == 1 ? REMAINING_TIME_MINUTE : REMAINING_TIME_MINUTES;
             result.append(minuteArg.apply(minutes));
         }
 
         if (seconds != 0) {
             if (hours != 0 || minutes != 0) result.appendSpace();
-            var secondArg = hours == 1 ? REMAINING_TIME_SECOND : REMAINING_TIME_SECONDS;
+            var secondArg = seconds == 1 ? REMAINING_TIME_SECOND : REMAINING_TIME_SECONDS;
             result.append(secondArg.apply(seconds));
         }
 

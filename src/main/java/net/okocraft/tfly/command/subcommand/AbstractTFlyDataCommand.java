@@ -30,7 +30,8 @@ abstract class AbstractTFlyDataCommand implements SubCommand {
                 return null;
             }
         } else { // /tfly <cmd> <player>
-            target = Bukkit.getPlayerUniqueId(playerName);
+            var cachedPlayer = Bukkit.getOfflinePlayerIfCached(playerName);
+            target = cachedPlayer != null ? cachedPlayer.getUniqueId() : null;
 
             if (target == null) {
                 sender.sendMessage(MessageKeys.COMMAND_GENERAL_PLAYER_NOT_FOUND.apply(playerName));
